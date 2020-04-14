@@ -2,7 +2,7 @@ package mem;
 
 import java.util.Random;
 
-public class RC4 implements NumberGenerator {
+public class RC4 {
     private final int[] S = new int[256];
     private final int[] T = new int[256];
     private final int keylen;
@@ -18,7 +18,6 @@ public class RC4 implements NumberGenerator {
     public RC4() {
         int[] key = getRandomKey();
         keylen = key.length;
-        displayArray(key);
 
         for (int i = 0; i < 256; i++) {
             S[i] = i;
@@ -33,8 +32,6 @@ public class RC4 implements NumberGenerator {
             S[j] = S[i];
             S[i] = tmp;
         }
-
-        displayArray(S);
     }
 
     public int trans(int i, int j) {
@@ -47,7 +44,7 @@ public class RC4 implements NumberGenerator {
         return S[(S[i] + S[j]) % 256];
     }
 
-    public void generate() {
+    public int[] generate() {
         int[] sir = new int[256];
         int j = 0;
 
@@ -55,7 +52,7 @@ public class RC4 implements NumberGenerator {
             sir[i] = trans(i, j);
         }
 
-        displayArray(sir);
+        return sir;
     }
 
     private int[] getRandomKey() {
@@ -68,5 +65,21 @@ public class RC4 implements NumberGenerator {
         }
 
         return key;
+    }
+
+    static void getBias() {
+        int L = (int)Math.pow(2, 16);
+        int ap = 0;
+
+        for(int i = 0; i < L; i++) {
+            RC4 rc4 = new RC4();
+            int[] sir = rc4.generate();
+
+            if(sir[1] == 0) {
+                ap++;
+            }
+        }
+
+        System.out.println("Pe pozitia 2 apare 0 de: " + ap + " ori!");
     }
 }

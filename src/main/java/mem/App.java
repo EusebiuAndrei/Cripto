@@ -9,9 +9,9 @@ public class App
     public static void main( String[] args )
     {
         LFSR lfsr = new LFSR();
-        RC4 rc4 = new RC4();
+  //      RC4 rc4 = new RC4();
 
         //lfsr.generate();
-        rc4.generate();
+        RC4.getBias();
     }
 }
