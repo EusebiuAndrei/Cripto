@@ -1,42 +1,46 @@
 package mem;
 
-public class LFSR implements NumberGenerator {
-    static private final long POLY_MASK_32 = Long.parseLong("F73593FF", 16);
-    static private final long SEED_32 = Long.parseLong("E553F0FF", 16);
-    static private final long PERIOD_BIGGEST_FACTOR = 65537;
+import java.util.Random;
 
-    @Override
-    public void generate() {
-        printDetails();
-        long lfsrOn32Bits = generateWithLFSR(LFSR.SEED_32, LFSR.POLY_MASK_32);
-        System.out.println("Nr of bits 0: " + nrOfBits0(lfsrOn32Bits));
-        System.out.println("Nr of bits 1: " + nrOfBits1(lfsrOn32Bits));
+public class LFSR implements NumberGenerator {
+    private final int TAP;
+    private final int seedLength = 32;
+    private final int L = (int) Math.pow(2, 16);
+    private int[] seed = new int[seedLength];
+    private boolean display;
+
+    public LFSR(boolean display) {
+        this.display = display;
+
+        Random r = new Random();
+        TAP = r.nextInt(31);
+
+        for(int  i = 0; i < seedLength; i ++) {
+            seed[i] = r.nextInt(2);
+        }
     }
 
-    public long generateWithLFSR(long seed, long mask) {
-        long nrOfBits = Long.toBinaryString(seed).length();
+    public void generate() {
+        int nrOfBits0 = 0;
+        int nrOfBits1 = 0;
 
-        for(int i = 0; i < LFSR.PERIOD_BIGGEST_FACTOR; i++) {
-            long seedAndMask = seed & mask;
-            long bit = nrOfBits1(seedAndMask) % 2;
-            long feedback = (seed >> 1) | (bit << (nrOfBits - 1));
-            seed = feedback;
+        for(int nthFeed = 1; nthFeed <= L; nthFeed++){
+            int nextBit = (seed[seedLength - 1] ^ seed[TAP]);
+            if(display) System.out.print(nextBit);
+
+            for(int i = seedLength - 1; i > 0; i--) {
+                seed[i] = seed[i - 1];
+            }
+            seed[0] = nextBit;
+
+            if(nextBit == 0)
+                nrOfBits0++;
+            else
+                nrOfBits1++;
         }
 
-        return seed;
-    }
-
-    private long nrOfBits0(long number) {
-        String binaryNumberString = Long.toBinaryString(number).replace("1", "");
-        return binaryNumberString.length();
-    }
-
-    private long nrOfBits1(long number) {
-        String binaryNumberString = Long.toBinaryString(number).replace("0", "");
-        return binaryNumberString.length();
-    }
-
-    public void printDetails() {
-        System.out.println("Seed: " + SEED_32 + " Mask: " + POLY_MASK_32);
+        if(display) System.out.println();
+        if(display) System.out.println("Numarul de biti de 1: " + nrOfBits1);
+        if(display) System.out.println("Numarul de biti de 0: " + nrOfBits0);
     }
 }

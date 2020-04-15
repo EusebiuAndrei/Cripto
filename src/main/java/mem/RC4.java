@@ -2,10 +2,11 @@ package mem;
 
 import java.util.Random;
 
-public class RC4 {
+public class RC4 implements NumberGenerator {
     private final int[] S = new int[256];
     private final int[] T = new int[256];
     private final int keylen;
+    private boolean display;
 
     public void displayArray(int[] arr) {
         for(int i = 0; i < arr.length; i++) {
@@ -15,7 +16,9 @@ public class RC4 {
         System.out.println();
     }
 
-    public RC4() {
+    public RC4(boolean display) {
+        this.display = display;
+
         int[] key = getRandomKey();
         keylen = key.length;
 
@@ -44,7 +47,7 @@ public class RC4 {
         return S[(S[i] + S[j]) % 256];
     }
 
-    public int[] generate() {
+    public int[] generateOne() {
         int[] sir = new int[256];
         int j = 0;
 
@@ -67,19 +70,20 @@ public class RC4 {
         return key;
     }
 
-    static void getBias() {
+    public void generate() {
         int L = (int)Math.pow(2, 16);
         int ap = 0;
 
         for(int i = 0; i < L; i++) {
-            RC4 rc4 = new RC4();
-            int[] sir = rc4.generate();
+            RC4 rc4 = new RC4(false);
+            int[] sir = rc4.generateOne();
 
             if(sir[1] == 0) {
                 ap++;
             }
         }
 
-        System.out.println("Pe pozitia 2 apare 0 de: " + ap + " ori!");
+        if(display) System.out.println("Pe pozitia 2 apare 0 de: " + ap + " ori!");
+        if(display) System.out.println("Probabilitatea= "+"1\\" + (65557 / ap));
     }
 }
